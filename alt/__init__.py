@@ -12,6 +12,11 @@ from skimage.measure import regionprops
 from PIL import ImageFont
 from PIL import ImageDraw
 import numpy as np
+from pathlib import Path
+import re
+import unicodedata
+
+from datetime import datetime
 
 import os
 
@@ -98,9 +103,18 @@ class Kumiko:
         white = white_background_image.astype(np.float32) * (1 - alpha_factor)
         final_image = base + white
         return final_image.astype(np.uint8)
+    
+
+    def slugify(self, value):
+        value = str(value)
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+        value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+        return re.sub(r'[-\s]+', '-', value)
+
 
     def parse_image(self, filename, urls = None):
         im = self.read_transparent_png(filename) #[:,:,:3]
+        prefix = Path(filename).stem
         Image.fromarray(im)
         ## Convert to gray scale
         grayscale = rgb2gray(im[:,:,:3])
@@ -164,8 +178,22 @@ class Kumiko:
 
         for i, bbox in enumerate(self.flatten(clusters)):
             panel = im[bbox[0]:bbox[2], bbox[1]:bbox[3]]
-            Image.fromarray(panel).save(f'panels/{i}.png')
+            Image.fromarray(panel).save(f'panels/{prefix}-{i}.png')
 
+        created_date_file = datetime.now().astimezone().strftime("%Y-%m-%d")
+        markdownfilename = f'{created_date_file}-{prefix}.md'
+        file = open(markdownfilename, 'w')
+        created_date = datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%S%z")
+        print('---', file=file)
+        print(f'title: {filename}', file=file)
+        print(f'date: {created_date}', file=file)
+        print(f'categories: comics', file=file)
+        print(f'type: comics', file=file)
+        print(f'resources:', file=file)
+        print(f'- name: {prefix}-:counter', file=file)
+        print(f'    title: \'{prefix} #:counter\'', file=file)
+        print(f'    src: \'panels/{prefix}-*.png\'', file=file)
+        print('\n---\n', file=file)
 
 
 parser = argparse.ArgumentParser(description = 'Kumiko CLI')
