@@ -18,6 +18,16 @@ import unicodedata
 
 from datetime import datetime
 
+
+# TODO move to a different style
+# see for pkgx example  https://github.com/pkgxdev/pantry/blob/main/projects/vanna.ai/package.yml
+# https://github.com/pkgxdev/pantry/blob/e925de734f5046228e0af9ab307f2a580a3e7258/projects/asciinema.org/package.yml
+
+# https://github.com/pkgxdev/pantry/blob/e925de734f5046228e0af9ab307f2a580a3e7258/projects/opendev.org/git-review/package.yml
+# https://opendev.org/opendev/git-review/
+# https://github.com/asciinema/asciinema/
+# cli is https://github.com/vanna-ai/vanna
+
 import os
 
 class Kumiko:
